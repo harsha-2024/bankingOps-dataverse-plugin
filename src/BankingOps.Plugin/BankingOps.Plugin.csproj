@@ -1,0 +1,15 @@
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <AssemblyName>BankingOps.Plugin</AssemblyName>
+    <RootNamespace>BankingOps.Plugin</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Deterministic>true</Deterministic>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.51" />
+    <PackageReference Include="Microsoft.CrmSdk.Workflow" Version="9.0.2.51" />
+  </ItemGroup>
+</Project>
