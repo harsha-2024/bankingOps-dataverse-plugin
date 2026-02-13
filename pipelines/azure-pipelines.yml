@@ -1,0 +1,42 @@
+
+# Azure DevOps pipeline (basic)
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '6.x'
+
+- script: |
+    dotnet restore .\src\BankingOps.Plugin\BankingOps.Plugin.csproj
+    dotnet build .\src\BankingOps.Plugin\BankingOps.Plugin.csproj -c $(buildConfiguration)
+    dotnet test .\src\BankingOps.Tests\BankingOps.Tests.csproj -c $(buildConfiguration) --logger trx
+  displayName: 'Build & Test'
+
+- task: PowerShell@2
+  displayName: 'Install Power Platform CLI'
+  inputs:
+    targetType: 'inline'
+    script: |
+      dotnet tool install --global Microsoft.PowerApps.CLI.Tool --version 1.*
+      echo "##vso[task.prependpath]%USERPROFILE%/.dotnet/tools"
+
+- task: PowerShell@2
+  displayName: 'Pack & Import Solution (optional)'
+  inputs:
+    targetType: 'inline'
+    script: |
+      cd solution
+      pac auth create --url $(DATAVERSE_URL) --tenant $(AZURE_TENANT_ID) --applicationId $(AZURE_APP_ID) --clientSecret $(AZURE_APP_SECRET)
+      pac auth select --index 0
+      pac solution pack --zipfile .\BankingOps_Managed.zip --process-steps build
+      pac solution import --path .\BankingOps_Managed.zip --publish-changes true
+  # Define pipeline variables/secret variables in your library or variable group
